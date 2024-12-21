@@ -1193,8 +1193,8 @@ bool UpdateMediaEx(MediaStream* media, double deltaTime)
 				streamCtx->startPts = avPacket->pts;
 			}
 
-			const double nextFrameTime = (double)(avPacket->pts - streamCtx->startPts) *
-				av_q2d(ctx->formatContext->streams[streamCtx->streamIdx]->time_base);
+			const AVRational* timebase = &ctx->formatContext->streams[streamCtx->streamIdx]->time_base;
+			const double nextFrameTime = (double)(avPacket->pts - streamCtx->startPts) * timebase->num / timebase->den;
 
 			// It's not yet time to use the packet
 			// Since we have just "peeked" the packet no reference handling is needed
