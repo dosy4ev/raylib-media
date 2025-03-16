@@ -31,7 +31,7 @@ const char* ExampleTitle = "Example 01 - Basics";
 
 const int   ScreenWidth = 1920 / 2;
 const int   ScreenHeight = 1080 / 2;
-const char* MovieFile = "resources/videos/sintel.mp4"; // Adjust path to your movie file (e.g., "path/to/your_file.mp4")
+const char* MovieFile = "resources/clips/005.mp4"; // Adjust path to your movie file (e.g., "path/to/your_file.mp4")
 
 //--------------------------------------------------------------------------------------------------
 
