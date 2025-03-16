@@ -1,4 +1,4 @@
-![Version](https://img.shields.io/badge/raylib--media-v0.2beta-informational) ![Version](https://img.shields.io/badge/raylib-v5.5-informational) ![License](https://img.shields.io/github/license/cloudofoz/raylib-media)
+![Version](https://img.shields.io/badge/raylib--media-v0.3beta-informational) ![Version](https://img.shields.io/badge/raylib-v5.5-informational) ![License](https://img.shields.io/github/license/cloudofoz/raylib-media)
 
 > **Note**: This library is in **beta**. Your feedback and support in enhancing its quality are greatly appreciated!
 
@@ -20,6 +20,7 @@ It enables easy integration of multimedia content into raylib applications, prov
 - [Dependencies](#dependencies)
 - [About FFmpeg](#about-ffmpeg)
 - [License](#license)
+- [What's New](#whats-new)
 - [Credits](#credits)
 
 ## Core Features
@@ -87,7 +88,7 @@ UnloadMedia(&media); // Unload media when done
 
 ## Dependencies
 
-`raylib-media` depends on the following files and libraries (*a build system is not yet available, contributions are welcomed!*):
+`raylib-media` depends on the following files and libraries:
 > *E.g. with GCC*: `gcc ... rmedia.c -lraylib -lavcodec -lavformat -lavutil -lswresample -lswscale`
 
 
@@ -141,6 +142,13 @@ FFmpeg is available in two versions:
 This project is licensed under the **Zlib** License - see the [LICENSE](LICENSE.md) file for details.
 
 ---
+
+## What's New
+
+- **v0.3beta** (latest)
+  - **Added CMake support** for cross-platform builds
+ 
+---
   
 ## Credits
 
@@ -149,3 +157,4 @@ Special thanks to the following resources:
 - [FFmpeg Libav Tutorial](https://github.com/leandromoreira/ffmpeg-libav-tutorial) - This resource was invaluable in helping me start to dive into FFmpeg and Libav.
 - [FFmpeg Builds by BtbN](https://github.com/BtbN/FFmpeg-Builds) - For providing compiled dependencies that are easy and straightforward to use, perfect for immediately starting to use **raylib-media** in a "portable" way.
 - [Blender Open Movie projects](https://studio.blender.org/films/) - These movies are not just very cool, but they have been a precious resource for testing my code.
+- [@GuvaCode](https://github.com/guvacode/) for his contribution with CMake support!
