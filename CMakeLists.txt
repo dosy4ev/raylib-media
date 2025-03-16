@@ -2,14 +2,12 @@
 project("raymedia")
 
 # This section configures MSVC (Visual Studio) to enable "Edit and Continue" debugging
-
 if(POLICY CMP0141)
     cmake_policy(SET CMP0141 NEW)
     set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "$<IF:$<AND:$<C_COMPILER_ID:MSVC>,$<CXX_COMPILER_ID:MSVC>>,$<$<CONFIG:Debug,RelWithDebInfo>:EditAndContinue>,$<$<CONFIG:Debug,RelWithDebInfo>:ProgramDatabase>>")
 endif()
 
 # Determine the project's root directory and check if it's the main project
-
 set(RMEDIA_ROOT_PATH ${CMAKE_CURRENT_SOURCE_DIR})
 
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
@@ -19,72 +17,55 @@ else()
 endif()
 
 # Project configuration options
-
 option(RMEDIA_BUILD_SHARED "Build raymedia as a shared library" OFF)
 option(RMEDIA_BUILD_EXAMPLES "Build the examples" ${RMEDIA_IS_MAIN})
 
-# Include standard cmake scripts
+# Add the CMake module path for custom FindFFMPEG.cmake and FindRaylib.cmake
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/CMakeModules/")
 
-include(CheckLibraryExists)
+# Find FFmpeg
+find_package(FFMPEG REQUIRED)
 
-# Submodule check for raylib
+# Find Raylib
+find_package(RAYLIB REQUIRED)
 
-set(RAYLIB_PATH "${RMEDIA_ROOT_PATH}/external/raylib")
-
-if(EXISTS "${RAYLIB_PATH}/CMakeLists.txt")
-  if(RMEDIA_BUILD_SHARED)
-   set(BUILD_SHARED_LIBS ON)
-  endif() 
-    message(STATUS "Submodule raylib found and valid.")
-    add_subdirectory("${RAYLIB_PATH}")
+if(NOT RAYLIB_FOUND)
+    message(FATAL_ERROR "Raylib not found! Install it or provide custom paths using -DRAYLIB_INCLUDE_DIR and -DRAYLIB_LIBRARY_DIR")
 else()
-    find_package(raylib QUIET)
-    if(TARGET raylib)
-        message(STATUS "raylib found via find_package.")
-    else()
-        message(FATAL_ERROR "The 'raylib' submodule is missing or incomplete, and 'find_package(raylib)' failed. Please make sure the submodule is initialized and updated (git submodule update --init --recursive).")
-    endif()
+    message(STATUS "Raylib found and linked: ${RAYLIB_LIBRARY}")
 endif()
 
-# Create the raygizmo library by adding all the source files
-
+# Set the library type
 set(RMEDIA_LIB_TYPE STATIC)
-
 if(RMEDIA_BUILD_SHARED)
     set(RMEDIA_LIB_TYPE SHARED)
     add_definitions(-DRMEDIA_BUILD_SHARED)
 endif()
 
-add_library(${PROJECT_NAME} ${RMEDIA_LIB_TYPE}
-    "${RMEDIA_ROOT_PATH}/src/rmedia.c"
-    
-)
+# Create the raymedia library
+add_library(${PROJECT_NAME} ${RMEDIA_LIB_TYPE} "${RMEDIA_ROOT_PATH}/src/rmedia.c")
 
 # Link project dependencies
+if(FFMPEG_FOUND AND RAYLIB_FOUND)
+    target_include_directories(${PROJECT_NAME} PUBLIC "${CMAKE_SOURCE_DIR}/src" ${FFMPEG_INCLUDE_DIRS} ${RAYLIB_INCLUDE_DIR})
+    target_link_libraries(${PROJECT_NAME} PUBLIC 
+        ${RAYLIB_LIBRARY} ${FFMPEG_LIBRARIES}
+    )
 
-target_link_libraries(${PROJECT_NAME} PUBLIC raylib avcodec avformat avutil swresample swscale)
-
-check_library_exists(m cos "" HAVE_LIB_M)
-
-if(HAVE_LIB_M)
-    target_link_libraries(${PROJECT_NAME} PUBLIC m)
+    # Link Windows Multimedia API if on Windows
+    if(WIN32)
+        target_link_libraries(${PROJECT_NAME} PUBLIC winmm)
+    endif()
+else()
+    message(FATAL_ERROR "FFmpeg or Raylib not found. Please install them or provide the correct paths.")
 endif()
 
-# Specify the include directories needed for the project
-
-target_include_directories(${PROJECT_NAME} PUBLIC
-    "${RMEDIA_ROOT_PATH}/include"
-    "${RMEDIA_ROOT_PATH}/external/raylib/src"
-)
-
 # Ensure the C standard is set for MSVC if using CMake version greater than 3.12
-
 if(CMAKE_VERSION VERSION_GREATER 3.12)
     set_property(TARGET raymedia PROPERTY C_STANDARD 99)
 endif()
 
 # Example configuration
-
 if(RMEDIA_BUILD_EXAMPLES)
-    include("${RMEDIA_ROOT_PATH}/examples/CMakeLists.txt")
+    add_subdirectory("${RMEDIA_ROOT_PATH}/examples/media")
 endif()
