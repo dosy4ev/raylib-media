@@ -556,6 +556,11 @@ MediaContext* LoadMediaContext(const char* fileName, MediaStreamReader streamRea
 
 	ctx->state = MEDIA_STATE_INVALID;
 
+	for (int i = 0; i < STREAM_COUNT; ++i)
+	{
+		ctx->streams[i].streamIdx = -1;
+	}
+
 	ctx->formatContext = avformat_alloc_context();
 
 	if (!ctx->formatContext)
