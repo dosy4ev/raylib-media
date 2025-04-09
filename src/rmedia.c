@@ -170,8 +170,8 @@ typedef struct MediaContext
 	// Video stream-related fields
 	struct SwsContext* swsContext;              // Video resampling and scaling context
 	Image videoOutputImage;                     // Image buffer holding the decoded video frame, uploaded to [MediaStream].videoTexture
-	uint8_t *alignedRgbData[4];                 // Pointers to the RGB buffers used for YUV-to-RGB frame conversion
-	int alignedRgbLinesize[4];                  // Linesizes for the RGB buffers used for YUV-to-RGB frame conversion
+	uint8_t *alignedRgbData[4];                 // Pointers to the RGB buffers used for frame conversion
+	int alignedRgbLinesize[4];                  // Linesizes for the RGB buffers used for frame conversion
 
 	// Audio stream-related fields
 	struct SwrContext* swrContext;              // Audio resampling context
@@ -709,7 +709,7 @@ MediaContext* LoadMediaContext(const char* fileName, MediaStreamReader streamRea
 				int allocatedBytes = av_image_alloc(ctx->alignedRgbData, ctx->alignedRgbLinesize, codecCtx->width, codecCtx->height, AV_PIX_FMT_RGB24, 32);
 
 				if (allocatedBytes < 0) {
-					TraceLog(LOG_ERROR, "MEDIA: Cannot allocate memory for the YUV-to-RGB conversion buffer.");
+					TraceLog(LOG_ERROR, "MEDIA: Cannot allocate memory for the frame conversion buffer.");
 					UnloadImage(ctx->videoOutputImage);
 					AVUnloadCodecContext(videoCtx);
 					continue;
