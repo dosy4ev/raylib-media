@@ -87,6 +87,7 @@ enum
 	MEDIA_ERR_CODEC_ALLOC_FAILED,							// Codec context allocation failure
 	MEDIA_ERR_CTX_PARAMS_FAILED,							// Failed to copy codec parameters
 	MEDIA_ERR_CODEC_OPEN_FAILED,							// Codec initialization failure
+	MEDIA_ERR_SWSCALE_FAILED,								// Error converting/scaling video frame
 
 
 	// Success and EOF return codes -----------------------------------------------------------------
@@ -1988,7 +1989,7 @@ int  AVProcessVideoFrame(const MediaStream* media)
 	int ret = sws_scale(ctx->swsContext, (const uint8_t* const*)ctx->avFrame->data, ctx->avFrame->linesize, 0, codec->height, ctx->alignedRgbData, ctx->alignedRgbLinesize);
 	if (ret <= 0) {
 		TraceLog(LOG_ERROR, "MEDIA: Failed to convert frame");
-		return -1;
+		return MEDIA_ERR_SWSCALE_FAILED;
 	}
 
 	for (int y = 0; y < codec->height; y++) {
