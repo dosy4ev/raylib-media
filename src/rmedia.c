@@ -323,7 +323,7 @@ void AVUnloadCodecContext(StreamDataContext* streamCtx);
 // - streamReader: A MediaStreamReader containing custom IO callbacks. Takes precedence over fileName if valid.
 // - flags: Combination of MediaLoadFlag values to configure loading behavior.
 // Returns: Pointer to the allocated MediaContext on success, or NULL on failure.
-MediaContext* LoadMediaContext(const char* fileName, MediaStreamReader streamReader, int flags);
+MediaContext* LoadMediaContext(const char* fileName, const AVInputFormat *ifmt, const AVDictionary *options, MediaStreamReader streamReader, int flags);
 
 void UnloadMediaContext(MediaContext* ctx);
 
@@ -550,8 +550,7 @@ bool SetMediaLooping(MediaStream media, bool loopPlay)
 //---------------------------------------------------------------------------------------------------
 // Functions Definition - Media Context loading and unloading
 //---------------------------------------------------------------------------------------------------
-
-MediaContext* LoadMediaContext(const char* fileName, MediaStreamReader streamReader, int flags)
+MediaContext* LoadMediaContext(const char* fileName, const AVInputFormat *ifmt, const AVDictionary *options, MediaStreamReader streamReader, int flags)
 {
 	MediaContext* ctx = (MediaContext*) RL_MALLOC(sizeof(MediaContext));
 
@@ -611,7 +610,7 @@ MediaContext* LoadMediaContext(const char* fileName, MediaStreamReader streamRea
 		ctx->formatContext->flags |= AVFMT_FLAG_CUSTOM_IO;
 	}
 
-	int ret = avformat_open_input(&ctx->formatContext, fileName, NULL, NULL);
+	int ret = avformat_open_input(&ctx->formatContext, fileName, ifmt, options);
 
 	if ( ret < 0) {
 		AVPrintError(ret);
@@ -1029,7 +1028,13 @@ MediaStream LoadMediaFromContext(MediaContext *ctx, int flags)
 
  MediaStream LoadMediaEx(const char* fileName, int flags)
  {
-	 MediaContext* ctx = LoadMediaContext(fileName, (MediaStreamReader) { 0 }, flags);
+	 MediaContext* ctx = LoadMediaContext(fileName, NULL, NULL, (MediaStreamReader) { 0 }, flags);
+	 return LoadMediaFromContext(ctx, flags);
+ }
+
+ MediaStream LoadMediaPro(const char* fileName, const AVInputFormat *ifmt, const AVDictionary *options, int flags)
+ {
+	 MediaContext* ctx = LoadMediaContext(fileName, ifmt, options, (MediaStreamReader) { 0 }, flags);
 	 return LoadMediaFromContext(ctx, flags);
  }
 

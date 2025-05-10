@@ -30,6 +30,7 @@
 
 #include <raylib.h>
 #include <stdint.h>
+#include <libavformat/avformat.h>
 
 //--------------------------------------------------------------------------------------------------
 // Structures Definition
@@ -173,6 +174,8 @@ extern "C" {
      * @return MediaStream on success; empty structure on failure
      */
     RLAPI MediaStream LoadMediaEx(const char* fileName, int flags);
+
+    RLAPI MediaStream LoadMediaPro(const char* fileName, const AVInputFormat *ifmt, const AVDictionary *options, int flags);
 
     /**
      * Load a MediaStream from a custom stream with flags.
